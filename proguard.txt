@@ -1,0 +1,9 @@
+-injars  build/libs/logisim-2.7.2.jar
+-outjars build/libs/logisim-2.7.2-proguard.jar
+
+-forceprocessing
+-dontobfuscate
+-keepdirectories
+-keepattributes
+-dontoptimize
+-dontwarn

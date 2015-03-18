@@ -30,13 +30,35 @@ jar {
     }
     // create a fat jar
     from {
-              configurations.compile.collect {
-                  it.isDirectory() ? it : zipTree(it)
-              }
-              configurations.runtime.collect {
-                  it.isDirectory() ? it : zipTree(it)
-              }
-          }
+    	configurations.compile.collect {
+    		it.isDirectory() ? it : (it.name.contains('xml-apis-1.3.04.jar') ? it : zipTree(it) )
+    	}
+    } {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+        exclude "META-INF/NOTICE"
+        exclude "META-INF/LICENSE"
+    }
+}
+
+task proguard(type: proguard.gradle.ProGuardTask, dependsOn: jar) {
+	outputs.upToDateWhen { false }
+	configuration("/proguard.txt")
+	printseeds "/proguard-output.txt"
+	
+	keep "class com.cburch.logisim.Main { public static void main(java.lang.String[]); }"
+	keep "class com.cburch.logisim.gui.start.Startup { *; }"
+	keep "class com.cburch.logisim.file.** { *; }"
+	keep "class com.cburch.logisim.comp.** { *; }"
+	keep "class org.apache.batik.** { *; }"
+	keep "interface org.apache.batik.** {*;}"
+	keep "class javax.help.** { *; }"
+	keep "class org.slf4j.** { *; }"
+    keep "interface org.slf4j.** {*;}"
+	keep "class org.w3c.** { *; }"
+	keep "interface org.w3c.** {*;}"
+	keep "class itextpdf.** { *; }"
 }
 
 launch4j {
@@ -56,8 +78,7 @@ buildscript {
     dependencies {
         classpath \
         'edu.sc.seis.gradle:launch4j:1.0.6',
-        'net.sourceforge.nekohtml:nekohtml:1.9.18',
-        'javax.help:javahelp:2.0.05',
+        'net.sourceforge.nekohtml:nekohtml:1.9.21',
         'edu.sc.seis.gradle:macappbundle:2.0.0',
         'net.sf.proguard:proguard-gradle:5.2'
     }
@@ -75,19 +96,18 @@ dependencies {
     'javax.help:javahelp:2.0.05',
     'com.connectina.swing:fontchooser:1.0',
     'net.sourceforge.collections:collections-generic:4.01',
-    'org.apache.xmlgraphics:batik-svggen:1.7',
-    'org.apache.xmlgraphics:batik-swing:1.7', 
+    'org.codeartisans.thirdparties.swing:batik-all:1.8pre-r1084380',
 
     // Native JDK logger (java.util.logging)
     //'org.slf4j:slf4j-jdk14:1.7.5',
 
     // Simplified logger (less lines)
-    'org.slf4j:slf4j-simple:1.6.1',
+    'org.slf4j:slf4j-simple:1.7.10',
 
     // Logging does nothing (use for release builds)
     //'org.slf4j:slf4j-nop:1.7.5',
 
-	'com.itextpdf:itextpdf:5.5.0',
+	'com.itextpdf:itextpdf:5.5.5',
 
     // Local dependencies convention: ./libs/*.jar
     fileTree(dir: 'libs', include: '*.jar')
@@ -135,4 +155,3 @@ processResources << {
         }
     }
 }
-
